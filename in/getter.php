@@ -1,7 +1,10 @@
 <?php
 date_default_timezone_set('America/Denver');
-if (!isset($_POST['songs'])) exit;
-$result = $_POST['songs'];
+if (!isset($_POST)) {
+  echo json_encode(["success"=>"0"]);
+  exit;
+}
+$songs = json_decode($_POST['songs']);
 
 function getCode ($q, $max = 1) {
   // Call set_include_path() as needed to point to your client library.
@@ -42,20 +45,20 @@ function getCode ($q, $max = 1) {
 
     return $videos;
   } catch (Google_ServiceException $e) {
-    $htmlBody .= sprintf('<p>A service error occurred: <code>%s</code></p>',
-      htmlspecialchars($e->getMessage()));
+    file_put_contents("log.txt", sprintf('<p>A service error occurred: <code>%s</code></p>',
+      htmlspecialchars($e->getMessage())));
   } catch (Google_Exception $e) {
-    $htmlBody .= sprintf('<p>An client error occurred: <code>%s</code></p>',
-      htmlspecialchars($e->getMessage()));
+    file_put_contents("log.txt", sprintf('<p>A client error occurred: <code>%s</code></p>',
+      htmlspecialchars($e->getMessage())));
   }
 }
 
 $tracks = [];
-foreach ($result as $track) {
+foreach ($songs as $track) {
   array_push($tracks, getCode($track));
 }
 
-$insResult = "S1, " . date("Y-m-d", time())."T".date("H:i", time()) . ", " . $_POST['playlist'] . ", " . $_POST['playlistnice'] . ", " . (count($result)+1) /*. ", " . json_encode($result)*/;
+$insResult = "S1, " . date("Y-m-d", time())."T".date("H:i", time()) . ", " . $_POST['playlist'] . ", " . $_POST['playlistnice'] . ", " . count($songs);
 $file = '../log.txt';
 $current = file_get_contents($file);
 $current = $insResult . "\n" . $current;

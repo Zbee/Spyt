@@ -175,30 +175,34 @@ Sorting contents of Spotify playlists
           $.ajax({
             type: "POST",
             url: "getter.php",
-            data: {playlist: "' . $thisID . '", playlistnice: "' . $playlist->name . '", songs:' . json_encode($tracks[$thisID]) . '},
+            data: {playlist: "' . $thisID . '", playlistnice: "' . $playlist->name . '", songs: JSON.stringify(' . json_encode($tracks[$thisID]) . ')},
             dataType: "json",
             context: document.body,
             async: true,
             complete: function(res, stato) {
               if (res.responseJSON.success == "2") {
-                $("#info").html("<div class=\'bar\'><span></span></div><br>We finished finding all of the song\'s MP3s!<br>Now we\'re downloading them all ...<br>(This could take quite some time, leave this tab open)");
-                $.ajax({
-                  type: "POST",
-                  url: "downloader.php",
-                  data: {playlist: "' . $thisID . '", playlistnice: "' . $playlist->name . '", songs: JSON.stringify(res.responseJSON.codes)},
-                  dataType: "json",
-                  context: document.body,
-                  async: true,
-                  complete: function(res, stato) {
-                    if (res.responseJSON.success == "2") {
-                      $("#info").html("<div class=\'bar\'><span></span></div><br>We finished finding all of the song\'s MP3s!<br>Now we\'re downloading them all ...<br>(This could take quite some time, leave this tab open)");
-                    } else if (res.responseJSON.success == "1") {
-                      $("#info").html("aw");
-                    } else {
-                      $("#info").html("AHHHH!");
+                $("#info").html("<div class=\'bar\'><span></span></div><br>We finished finding all of the songs\' MP3s!<br>Now we\'re downloading them all ...<br>(This could take quite some time, leave this tab open)");
+                var arr = res.responseJSON.codes;
+                var len = arr.length;
+                var yes = 1;
+                $.each(arr, function(index, value) {
+                  $.ajax({
+                    type: "POST",
+                    url: "downloader.php",
+                    data: {playlist: "' . $thisID . '", playlistnice: "' . $playlist->name . '", song: JSON.stringify(value)},
+                    dataType: "json",
+                    context: document.body,
+                    async: true,
+                    complete: function(res, stato) {
+                      console.log(JSON.stringify(res));
+                      if (res.responseJSON.success == "2" && yes != len) {
+                        $("#info").html("<div class=\'bar\'><span></span></div><br>We finished finding all of the songs\' MP3s!<br>Now we\'re downloading them all ...<br>(This could take quite some time, leave this tab open)");
+                        yes += 1;
+                      } else if (res.responseJSON.success == "2" && yes == len) {
+                        $("#info").html("All of your songs have finished downloading to our servers.<br><a target=\'_blank\' href=\'download.php?d=" + res.responseJSON.d + "\'>Download playlist</a>");
+                      }
                     }
-                    //$("#info").html(JSON.stringify(res));
-                  }
+                  });
                 });
               } else if (res.responseJSON.success == "1") {
                 $("#info").html("aw");
@@ -214,13 +218,6 @@ Sorting contents of Spotify playlists
     }
   }
 }
-
-/*try {
-  $a = new PharData('c.tar');
-  $a->addFile('error_log');
-} catch (Exception $e) {
-  echo "Err: " . $e;
-}*/
 
 ?>
 
