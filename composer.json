@@ -1,6 +1,5 @@
 {
   "require": {
-    "chellem/youtube-downloader": "dev-master",
     "google/apiclient": "1.0.*@beta",
     "jwilsson/spotify-web-api-php": "0.7.*"
   }

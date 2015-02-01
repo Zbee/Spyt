@@ -4,17 +4,14 @@ $song = json_decode($_POST['song']);
 
 $name = crc32($_POST["playlistnice"]);
 
-require_once __DIR__.'/../vendor/autoload.php';
-use Youtubedl\Youtubedl;
-
-$youtubedl=new Youtubedl();
-$youtubedl->getFilesystemOption()
-  ->setOutput('"/tmp/'.$name.'/%(title)s.%(ext)s"');
-$youtubedl->download($song);
+$url = "https://youtube.com/watch?v=" . $song;
+$cmd = 'youtube-dl --audio-format mp3 -o "/tmp/'.$name.'/%(title)s.%(ext)s" --extract-audio ' . escapeshellarg($url);
+exec($cmd, $output);
 
 echo json_encode(
   [
     "success"=>"2",
-    "d"=>"/tmp/".$name
+    "d"=>"/tmp/".$name,
+    "c"=>$output
   ]
 );
