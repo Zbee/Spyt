@@ -83,7 +83,7 @@ if ($lines < 3) {
   foreach ($recentr as $r) {
     if ($nr < 11 && $nr < $lines) {
       $d = explode(", ", $r);
-      $recent .=  "'" . $d[3] . "' (" . $d[4] . " songs - " . sizeFormat($d[4]*9e6) . ") [" . $d[0] . "]<br>";
+      $recent .=  "'" . $d[1] . "' (" . $d[2] . " - " . sizeFormat($d[2]*9e6) . ") [" . $d[0] . "]<br>";
       $nr += 1;
     }
   }
@@ -120,8 +120,6 @@ $api = new SpotifyWebAPI\SpotifyWebAPI();
         <p>This service will allow you to download an entire Spotify playlist to save you data and money when you're not at home.</p>
         <p>In order to use this service, you'll need to log into Spotify. We need permission to view your playlists (public and private).</p>
         <a href="<?=$session->getAuthorizeUrl(array('scope' => array('playlist-read-private')))?>">Log in</a>
-        <br>
-        <a style="background:#404040" href="keepinfo.php">What information is kept about you</a>
       </div>
     </div>
   </body>

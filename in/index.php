@@ -116,53 +116,45 @@ foreach ($playlists->items as $playlist) {
       }
     }
   }
-  if ((count($tracks[$thisID])+1)*2.5e6 > $mfs || count($tracks[$thisID]) < 2) {
-    $body .= '<a title="' . sizeFormat((count($tracks[$thisID])+1)*2.5e6) . '" data-id="' . $thisID . '" id="' . $thisID . '" class="no">' . $playlist->name . '</a><br>';
+  if ((count($tracks[$thisID])+1)*3.2e6 > $mfs || count($tracks[$thisID]) < 2) {
+    $body .= '<a title="' . sizeFormat((count($tracks[$thisID])+1)*3.2e6) . '" data-id="' . $thisID . '" id="' . $thisID . '" class="no">' . $playlist->name . '</a><br>';
   } else {
-    $body .= '<a title="' . sizeFormat((count($tracks[$thisID])+1)*2.5e6) . '" data-id="' . $thisID . '" id="' . $thisID . '">' . $playlist->name . '</a><br>';
+    $body .= '<a title="' . sizeFormat((count($tracks[$thisID])+1)*3.2e6) . '" data-id="' . $thisID . '" id="' . $thisID . '">' . $playlist->name . '</a><br>';
     $body .= '
       <script>
       $("#' . $thisID . '").click(function() {
-        $("#info").html("<div class=\'bar\'><span></span></div><br>Right now we\'re looking for all of the song\'s MP3s.<br>(This should only take a minute or two)");
-        $.ajax({
-          type: "POST",
-          url: "getter.php",
-          data: {playlist: "' . $thisID . '", playlistnice: "' . $playlist->name . '", songs: JSON.stringify(' . json_encode($tracks[$thisID]) . ')},
-          dataType: "json",
-          context: document.body,
-          async: true,
-          complete: function(res, stato) {
-            if (res.responseJSON.success == "2") {
-              $("#info").html("<div class=\'bar\'><span></span></div><br>We finished finding all of the songs\' MP3s!<br>Now we\'re downloading them all ...<br>(This could take quite some time, leave this tab open)");
-              var arr = res.responseJSON.codes;
-              var len = arr.length;
-              var yes = 1;
-              $.each(arr, function(index, value) {
+        var len = ' . count($tracks[$thisID]) . ';
+        arr = ' . json_encode($tracks[$thisID]) . ';
+        for (var i = 0; i <= len; i++) {
+          $.ajax({
+            type: "POST",
+            url: "getter.php",
+            data: {playlist: "' . $thisID . '", playlistnice: "' . $playlist->name . '", song: arr[i]},
+            dataType: "json",
+            context: document.body,
+            async: false,
+            complete: function(res, stato) {
+              if (res.responseJSON.success == "2") {
+                $("#info").html("The first song is about to download.");
                 $.ajax({
                   type: "POST",
                   url: "downloader.php",
-                  data: {playlist: "' . $thisID . '", playlistnice: "' . $playlist->name . '", song: JSON.stringify(value)},
+                  data: {playlist: "' . $thisID . '", playlistnice: "' . $playlist->name . '", song: res.responseJSON.code, name: arr[i]},
                   dataType: "json",
                   context: document.body,
-                  async: true,
-                  complete: function(res, stato) {
-                    if (res.responseJSON.success == "2" && yes != len) {
-                      $("#info").html("<div class=\'bar\'><span></span></div><br>We finished finding all of the songs\' MP3s!<br>Now we\'re downloading them all ...<br>(This could take quite some time, leave this tab open)");
-                      yes += 1;
-                    } else if (res.responseJSON.success == "2" && yes == len) {
-                      $("#info").html("All of your songs have finished downloading to our servers.<br><a target=\'_blank\' href=\'download.php?d=" + res.responseJSON.d + "\'>Download playlist</a>");
-                    }
-                  }
+                  async: true
                 });
-              });
-            } else if (res.responseJSON.success == "1") {
-              $("#info").html("aw");
-            } else {
-              $("#info").html("AHHHH!");
+              } else if (res.responseJSON.success == "1") {
+                $("#info").html("We failed to find the song on Youtube.");
+              } else {
+                $("#info").html("AHHHH! I DON\'T KNOW WHAT HAPPENED!<Br>" + JSON.stringify(res));
+              }
             }
-            //$("#info").html(JSON.stringify(res));
+          });
+          if (i == len) {
+            $("#info").html("All songs are now downloading.<br>When the downloads finish you can use this link to download it.<br><a target=\'_blank\' href=\'download.php?d=../tmp/' . crc32($playlist->name) . '\'>Download playlist</a>");
           }
-        });
+        }
       });
       </script>
     ';

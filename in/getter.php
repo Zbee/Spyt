@@ -4,7 +4,7 @@ if (!isset($_POST)) {
   echo json_encode(["success"=>"0"]);
   exit;
 }
-$songs = json_decode($_POST['songs']);
+$song = json_decode($_POST['song']);
 
 function getCode ($q, $max = 1) {
   // Call set_include_path() as needed to point to your client library.
@@ -47,15 +47,12 @@ function getCode ($q, $max = 1) {
   }
 }
 
-$tracks = [];
-foreach ($songs as $track) {
-  array_push($tracks, getCode($track));
-}
+$code = getCode($song);
 
-$insResult = date("Y-m-d\TH:i", time()) . ", " . $_POST['playlist'] . ", " . $_POST['playlistnice'] . ", " . count($songs);
+$insResult = date("Y-m-d\TH:i", time()) . ", " . $_POST['playlist'] . ", " . $_POST['playlistnice'];
 $file = '../log.txt';
 $current = file_get_contents($file);
 $current = $insResult . "\n" . $current;
 file_put_contents($file, $current);
 
-echo json_encode(["success"=>"2","codes"=>$tracks]);
+echo json_encode(["success"=>"2","code"=>$code]);
