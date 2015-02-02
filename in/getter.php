@@ -9,16 +9,10 @@ $songs = json_decode($_POST['songs']);
 function getCode ($q, $max = 1) {
   // Call set_include_path() as needed to point to your client library.
   require_once __DIR__.'/../vendor/autoload.php';
-
-  /*
-   * Set $DEVELOPER_KEY to the "API key" value from the "Access" tab of the
-   * Google Developers Console <https://console.developers.google.com/>
-   * Please ensure that you have enabled the YouTube Data API for your project.
-   */
-  $DEVELOPER_KEY = 'AIzaSyAy1BJn74Ex96iKMH4EOgxkQPMbrQsftrM';
+  require "../_secret_keys.php";
 
   $client = new Google_Client();
-  $client->setDeveloperKey($DEVELOPER_KEY);
+  $client->setDeveloperKey($GOOGLE_KEY);
 
   // Define an object that will be used to make all API requests.
   $youtube = new Google_Service_YouTube($client);
@@ -45,11 +39,11 @@ function getCode ($q, $max = 1) {
 
     return $videos;
   } catch (Google_ServiceException $e) {
-    file_put_contents("log.txt", sprintf('<p>A service error occurred: <code>%s</code></p>',
-      htmlspecialchars($e->getMessage())));
+    file_put_contents("../log.txt", sprintf("Err," . date("Y-m-d\TH:i", time()) . ", " . "A service error occurred: %s",
+      htmlspecialchars(str_replace("\n", "", $e->getMessage()))) . "\n" . file_get_contents("../log.txt"));
   } catch (Google_Exception $e) {
-    file_put_contents("log.txt", sprintf('<p>A client error occurred: <code>%s</code></p>',
-      htmlspecialchars($e->getMessage())));
+    file_put_contents("../log.txt", sprintf("Err," . date("Y-m-d\TH:i", time()) . ", " . "A client error occurred: %s",
+      htmlspecialchars(str_replace("\n", "", $e->getMessage()))) . "\n" . file_get_contents("../log.txt"));
   }
 }
 
@@ -58,7 +52,7 @@ foreach ($songs as $track) {
   array_push($tracks, getCode($track));
 }
 
-$insResult = "S1, " . date("Y-m-d", time())."T".date("H:i", time()) . ", " . $_POST['playlist'] . ", " . $_POST['playlistnice'] . ", " . count($songs);
+$insResult = date("Y-m-d\TH:i", time()) . ", " . $_POST['playlist'] . ", " . $_POST['playlistnice'] . ", " . count($songs);
 $file = '../log.txt';
 $current = file_get_contents($file);
 $current = $insResult . "\n" . $current;

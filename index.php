@@ -1,8 +1,15 @@
 <?php
 ob_start();
 
-putenv("SPOTIFY_CLIENT_ID=9ec000a9a4e04a0caf0fb87de826ef0f");
-putenv("SPOTIFY_CLIENT_SECRET=70dc9593647246cb8101f232edcb374c");
+/*
+Max folder size (in bytes)
+*/
+$mfs = 18e9;
+
+/*
+Your API keys
+*/
+require "_secret_keys.php";
 
 /*
 Including libraries
@@ -55,17 +62,10 @@ function sizeFormat($bytes){
 Number of items in log
 */
 $file = "log.txt";
-$transferso = 0;
-$transferst = 0;
 $lines = 0;
 $handle = fopen($file, "r");
 while(!feof($handle)){
   $line = fgets($handle);
-  if (strpos($line, 'S1, ') !== false) {
-    $transferso += 1;
-  } else {
-    $transferst += 1;
-  }
   $lines += 1;
 }
 fclose($handle);
@@ -73,7 +73,7 @@ fclose($handle);
 /*
 Echoing out recent logs
 */
-if ($lines == 1) {
+if ($lines < 3) {
   $recent = "No recent downloads.";
 } else {
   $recentr = file_get_contents("log.txt");
@@ -92,31 +92,15 @@ if ($lines == 1) {
 /*
 Disallowing use of system if too close to quota
 */
-$fso = folderSize("/tmp/");
-$fst = folderSize("/tmp/");
-
-if ($fso >= 18500000000 && $fst >= 18500000000) {
-  $info = "<p>We're terribly sorry, use of the system is suspended for the rest of the day.<br>Our server is full, and we have to wait until playlist archives expire.</p>";
-  $no = true;
-}
-if ($transferso >= 600 && $transferst >= 600) {
-  $info = "<p>We're terribly sorry, use of the system is suspended for the rest of the month.<br>We've hit the cap on how much data we can transfer.</p>";
-  $no = true;
-}
-
-/*
-Balancing server load
-*/
-if ($fso <= $fst) {
-  putenv("SPOTIFY_REDIRECT_URI=http://do.zbee.me/in");
-} else {
-  putenv("SPOTIFY_REDIRECT_URI=http://do.zbee.me/in2");
+$fs = folderSize("tmp");
+if ($fs >= $mfs) {
+  $info = "<p>We're terribly sorry, use of the system is suspended for a little while.<br>The server is full and we have to wait until some downloads have finished.</p>";
 }
 
 /*
 Setting up the Spotify API
 */
-$session = new SpotifyWebAPI\Session(getenv('SPOTIFY_CLIENT_ID'), getenv('SPOTIFY_CLIENT_SECRET'), getenv('SPOTIFY_REDIRECT_URI'));
+$session = new SpotifyWebAPI\Session($SPOTIFY_CLIENT_ID, $SPOTIFY_CLIENT_SECRET, $SPOTIFY_REDIRECT_URL);
 $api = new SpotifyWebAPI\SpotifyWebAPI();
 ?>
 
@@ -129,7 +113,7 @@ $api = new SpotifyWebAPI\SpotifyWebAPI();
   <body>
     <div id="ad"><a href="https://s.zbee.me/bfq" title="AD"><img src="http://i.imgur.com/E2njcd2.png" width="100%"></a></div>
     <div id="recent"><?=$recent?></div>
-    <div class="attrib" data-content="Server 0 - CA, USA | Server 1 - CA, US - <?=sizeFormat($fso)?>/20 GB - <?=$transferso?>/600 transfers | Server 2 - US - <?=sizeFormat($fst)?>/20 GB - <?=$transferst?>/600 transfers">&pi; </div>
+    <div class="attrib" data-content="Download Server - <?=sizeFormat($fs)?>/20 GB">&pi; </div>
     <div id="container">
       <a href='http://do.zbee.me' id='reload'>Spotify Downloader</a>
       <div id="main">
