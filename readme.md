@@ -1,8 +1,5 @@
 # Spyt
-Downloads complete Spotify playlists in MP3 format from Youtube, adds them to a .tar file, and returns that file.
-
-## Issues
-- Currently only runs on linux systems since the /tmp/ directory is used to store files.
+Downloads complete Spotify playlists in MP3 format from Youtube, adds them to a .tar file, and returns that file to you so you can have your lovely Spotify music for offline use in case you don't have the money for premium.
 
 ## Secret files
 In the system you will notice a secret file being referenced (`require "_secret_keys.php"`). These files contain sensitive information and so they cannot be included in the repo.
