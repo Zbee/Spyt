@@ -157,7 +157,7 @@ foreach ($playlists->items as $playlist) {
               $.ajax({
                 type: "POST",
                 url: "checker.php",
-                data: {folder: "../tmp/' . crc32($playlist->name) . '"},
+                data: {folder: "../tmp/' . crc32($playlist->name) . '", length: len},
                 dataType: "json",
                 context: document.body,
                 async: false,
