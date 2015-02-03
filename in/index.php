@@ -152,7 +152,22 @@ foreach ($playlists->items as $playlist) {
             }
           });
           if (i == len) {
-            $("#info").html("All songs are now downloading.<br>When the downloads finish you can use this link to download it.<br><a target=\'_blank\' href=\'download.php?d=../tmp/' . crc32($playlist->name) . '\'>Download playlist</a>");
+            $("#info").html("All songs are now downloading.");
+            window.setInterval(function(){
+              $.ajax({
+                type: "POST",
+                url: "checker.php",
+                data: {folder: "../tmp/' . crc32($playlist->name) . '"},
+                dataType: "json",
+                context: document.body,
+                async: false,
+                complete: function(res, stato) {
+                  if (res.responseJSON.success == "1") {
+                    $("#info").html("All songs have been downloaded.<br><a target=\'_blank\' href=\'download.php?d=../tmp/' . crc32($playlist->name) . '\'>Download playlist</a>");
+                  }
+                }
+              });
+            }, 15000);
           }
         }
       });
