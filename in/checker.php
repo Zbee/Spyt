@@ -15,7 +15,7 @@ if (!is_dir($folder)) {
 
   foreach ($items as $item) {
     if (strpos($item,'.m4a') !== false) {
-      if (!$echoed ) { echo json_encode(["success" => "1"]); $echoed = true;}
+      if (!$echoed ) { echo json_encode(["success" => "1"]); $echoed = true; }
       break;
     }
   }

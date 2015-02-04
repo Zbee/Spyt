@@ -177,7 +177,7 @@ foreach ($playlists->items as $playlist) {
                 complete: function(res, stato) {
                   if (res.responseJSON.success == "2") {
                     $("#info").html("All songs have been downloaded.<br><a target=\'_blank\' href=\'download.php?d=../tmp/' . crc32($thisID) . '&n=' . scrub($playlist->name) . '\'>Download playlist</a>");
-                  } else if (res.responseJSON.success == "1") {
+                  } else if (res.responseJSON.success == "1" || res.responseJSON.success == "3") {
 
                   } else if (res.responseJSON.success == "4" || $("#info").text().indexOf("Enoy!") > -1) {
                     $("#info").html("Your download has begun.<br>Enjoy!");
