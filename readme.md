@@ -1,4 +1,6 @@
 # Spyt
+Spotify (and other Players) downloader via YouTube
+
 Downloads complete Spotify playlists in MP3 format from Youtube, adds them to a .tar file, and returns that file to you so you can have your lovely Spotify music for offline use in case you don't have the money for premium.
 
 ## Installation
