@@ -4,7 +4,7 @@ ob_start();
 /*
 Max folder size (in bytes)
 */
-$mfs = 18e9;
+$mfs = 19e9;
 
 /*
 Your API keys
@@ -58,6 +58,17 @@ function sizeFormat($bytes){
   }
 }
 
+function dirsize($a) {
+  $b=new RecursiveIteratorIterator(new RecursiveDirectoryIterator($a));
+  $c = 0;
+  foreach($b as $d){
+    $c+=$d->getSize();
+  }
+  return $c;
+}
+
+$fs = dirsize("tmp");
+
 /*
 Number of items in log
 */
@@ -83,7 +94,7 @@ if ($lines < 3) {
   foreach ($recentr as $r) {
     if ($nr < 11 && $nr < $lines) {
       $d = explode(", ", $r);
-      $recent .=  "'" . $d[1] . "' (" . $d[2] . " - " . sizeFormat($d[2]*9e6) . ") [" . $d[0] . "]<br>";
+      $recent .=  "'" . $d[1] . "' (" . sizeFormat($d[2]) . ") [" . $d[0] . "]<br>";
       $nr += 1;
     }
   }
@@ -111,15 +122,15 @@ $api = new SpotifyWebAPI\SpotifyWebAPI();
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
   </head>
   <body>
-    <div id="ad"><a href="https://s.zbee.me/bfq" title="AD"><img src="http://i.imgur.com/E2njcd2.png" width="100%"></a></div>
+    <!--<div id="ad"><a href="https://s.zbee.me/bfq" title="AD"><img src="http://i.imgur.com/E2njcd2.png" width="100%"></a></div>-->
     <div id="recent"><?=$recent?></div>
-    <div class="attrib" data-content="Download Server - <?=sizeFormat($fs)?>/20 GB">&pi; </div>
+    <div class="attrib" data-content="<?=sizeFormat($fs)?>/<?=sizeformat($mfs)?>">&pi; </div>
     <div id="container">
-      <a href='http://do.zbee.me' id='reload'>Spotify Downloader</a>
+      <a href="./" id="reload">Spyt</a>
       <div id="main">
         <p>This service will allow you to download an entire Spotify playlist to save you data and money when you're not at home.</p>
         <p>In order to use this service, you'll need to log into Spotify. We need permission to view your playlists (public and private).</p>
-        <a href="<?=$session->getAuthorizeUrl(array('scope' => array('playlist-read-private')))?>">Log in</a>
+        <a href="<?=$session->getAuthorizeUrl(array('scope' => array('playlist-read-private')))?>">Log in with Spotify</a>
       </div>
     </div>
   </body>

@@ -9,4 +9,12 @@ function getsize($a,$b=2){if(is_file($a)){$a=filesize($a);}elseif(is_dir($a)){$a
 function dirsize($a){$b=new RecursiveIteratorIterator(new RecursiveDirectoryIterator($a));$c = 0;foreach($b as $d){$c+=$d->getSize();}return $c;}
 function _download($a,$b){header('Content-Description: File Transfer');header('Content-Type: application/octet-stream');header('Content-Length: '.getsize($a));header('Content-Disposition: attachment; filename='.basename($b));readfile($a);}
 _download($_GET["d"].".tar", $_GET["d"].".tar");
+
+$insResult = date("Y-m-d\TH:i", time()) . ", " . $_GET['n'] . ", " . getsize($_GET["d"].".tar");
+$file = '../log.txt';
+$current = file_get_contents($file);
+$new = $insResult . "\n" . $current;
+file_put_contents($file, $new);
+
 unlink($_GET["d"].".tar");
+?>

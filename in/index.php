@@ -76,6 +76,17 @@ function sizeFormat($bytes){
   }
 }
 
+function dirsize($a) {
+  $b=new RecursiveIteratorIterator(new RecursiveDirectoryIterator($a));
+  $c = 0;
+  foreach($b as $d){
+    $c+=$d->getSize();
+  }
+  return $c;
+}
+
+$fs = dirsize("../tmp");
+
 /*
 Setting up the Spotify API
 */
@@ -125,17 +136,19 @@ foreach ($playlists->items as $playlist) {
       $("#' . $thisID . '").click(function() {
         var len = ' . count($tracks[$thisID]) . ';
         arr = ' . json_encode($tracks[$thisID]) . ';
-        for (var i = 0; i <= len; i++) {
+        for (var i = 0; i < len; i++) {
           $.ajax({
             type: "POST",
             url: "getter.php",
             data: {playlist: "' . $thisID . '", playlistnice: "' . $playlist->name . '", song: arr[i]},
             dataType: "json",
             context: document.body,
-            async: false,
+            async: false, //Must not be async, otherwise `arr[i]` is undefined
             complete: function(res, stato) {
+              res.responseJSON.song = arr[i];
+              console.log(res.responseJSON);
               if (res.responseJSON.success == "2") {
-                $("#info").html("The first song is about to download.");
+                $("#info").html("The songs are now downloading.");
                 $.ajax({
                   type: "POST",
                   url: "downloader.php",
@@ -151,19 +164,25 @@ foreach ($playlists->items as $playlist) {
               }
             }
           });
-          if (i == len) {
+          if (i+1 == len) {
             $("#info").html("All songs are now downloading.");
             window.setInterval(function(){
               $.ajax({
                 type: "POST",
                 url: "checker.php",
-                data: {folder: "../tmp/' . crc32($playlist->name) . '", length: len},
+                data: {folder: "../tmp/' . crc32($thisID) . '", length: len},
                 dataType: "json",
                 context: document.body,
                 async: false,
                 complete: function(res, stato) {
-                  if (res.responseJSON.success == "1") {
-                    $("#info").html("All songs have been downloaded.<br><a target=\'_blank\' href=\'download.php?d=../tmp/' . crc32($playlist->name) . '\'>Download playlist</a>");
+                  if (res.responseJSON.success == "2") {
+                    $("#info").html("All songs have been downloaded.<br><a target=\'_blank\' href=\'download.php?d=../tmp/' . crc32($thisID) . '&n=' . scrub($playlist->name) . '\'>Download playlist</a>");
+                  } else if (res.responseJSON.success == "1") {
+
+                  } else if (res.responseJSON.success == "4" || $("#info").text().indexOf("Enoy!") > -1) {
+                    $("#info").html("Your download has begun.<br>Enjoy!");
+                  } else {
+                    $("#info").html("AHHHHH! I DUNNO WHAT HAPPENED!<Br>" + JSON.stringify(res));
                   }
                 }
               });
@@ -184,9 +203,9 @@ foreach ($playlists->items as $playlist) {
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
   </head>
   <body>
-    <div class="attrib" data-content="Download Server - <?=sizeFormat(folderSize("../tmp"))?>/20 GB">&pi; </div>
+    <div class="attrib" data-content="<?=sizeFormat($fs)?>/<?=sizeformat($mfs)?>">&pi; </div>
     <div id="container">
-      <a href='http://do.zbee.me' id='reload'>Spotify Downloader</a>
+      <a href="../" id="reload">Spyt</a>
       <div id="main">
         <?=$info?>
         <?=$body?>

@@ -1,14 +1,14 @@
 <?php
 date_default_timezone_set('America/Denver');
-if (!isset($_POST)) {
+if (!isset($_POST["song"])) {
   echo json_encode(["success"=>"0"]);
   exit;
 }
-$song = json_decode($_POST['song']);
+$song = $_POST["song"];
 
 function getCode ($q, $max = 1) {
   // Call set_include_path() as needed to point to your client library.
-  require_once __DIR__.'/../vendor/autoload.php';
+  require_once __DIR__."/../vendor/autoload.php";
   require "../_secret_keys.php";
 
   $client = new Google_Client();
@@ -20,9 +20,12 @@ function getCode ($q, $max = 1) {
   try {
     // Call the search.list method to retrieve results matching the specified
     // query term.
-    $searchResponse = $youtube->search->listSearch('id,snippet', array(
-      'q' => $q . ' lyrics -literal -parody -vevo -official',
-      'maxResults' => $max,
+    $searchResponse = $youtube->search->listSearch("id,snippet", array(
+      "q" => $q . " -acoustic -live -literal -parody -vevo -official",
+      "maxResults" => $max,
+      "type" => "video",
+      "videoDimension" => "2d",
+      "videoDuration" => "medium"
     ));
 
     $videos = '';
@@ -48,11 +51,5 @@ function getCode ($q, $max = 1) {
 }
 
 $code = getCode($song);
-
-$insResult = date("Y-m-d\TH:i", time()) . ", " . $_POST['playlist'] . ", " . $_POST['playlistnice'];
-$file = '../log.txt';
-$current = file_get_contents($file);
-$current = $insResult . "\n" . $current;
-file_put_contents($file, $current);
 
 echo json_encode(["success"=>"2","code"=>$code]);

@@ -22,12 +22,12 @@
 
 * {
   font-size: 26px;
-  color:#999999;
+  color:#FFFFFF;
   font-family: 'proxima_nova', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 html, body {
-  background:#373737;
+  background:#231F20;
 }
 
 #container {
@@ -40,8 +40,8 @@ html, body {
 }
 
 #reload {
-  background:#404040;
-  color:#ffffff;
+  background:#302F2F;
+  color:#FFFFFF;
   text-decoration:none;
   width:100%;
   padding:20px 0px;
@@ -57,7 +57,7 @@ html, body {
 }
 
 p {
-  background:#404040;
+  background:#302F2F;
   -webkit-border-radius:100px;
   -moz-border-radius:100px;
   border-radius:100px;
@@ -66,31 +66,31 @@ p {
 }
 
 a, a:visited, a:active {
-  background:rgb(100, 143, 0);
+  background: #75C92B;
   -webkit-border-radius:100px;
   -moz-border-radius:100px;
   border-radius:100px;
   padding:20px;
   display:block;
-  color:white;
+  color:#FFFFFF;
   text-decoration: none;
   cursor:pointer;
 }
 
 a:hover {
-  background:#63b700;
+  background:#74BE2C;
   cursor:pointer;
 }
 
 .no {
-  background:#404040;
-  color:#999999;
+  background:#302F2F;
+  color:#FFFFFF;
   cursor:disabled;
 }
 
 .no:hover {
-  background:#404040;
-  color:#999999;
+  background:#302F2F;
+  color:#FFFFFF;
   cursor:not-allowed;
 }
 
@@ -117,7 +117,7 @@ a:hover {
   max-width:20%;
   overflow:hidden;
   text-align:right;
-  background:#404040;
+  background:#302F2F;
   -webkit-border-bottom-left-radius:100px;
   -moz-border-bottom-left-radius:100px;
   border-bottom-left-radius:100px;
